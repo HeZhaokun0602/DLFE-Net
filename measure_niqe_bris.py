@@ -26,18 +26,12 @@ def metrics(im_dir):
         n += 1
 
         im1 = Image.open(item).convert('RGB')
-        #score_brisque = brisque.score(im1)
         im1 = np.array(im1)
         score_niqe = calculate_niqe(im1)
-
-        #avg_brisque += score_brisque
         avg_niqe += score_niqe
-
         niqe.append(score_niqe)
-
         torch.cuda.empty_cache()
 
-    #avg_brisque = avg_brisque / n
     avg_niqe = avg_niqe / n
 
     print(np.mean(niqe), np.std(niqe))
@@ -46,8 +40,6 @@ def metrics(im_dir):
 
 if __name__ == '__main__':
 
-    im_dir = './output/DICM/*.jpg'
-
     if ep.DICM:
         im_dir = './output/DICM/*.jpg'
 
@@ -55,7 +47,7 @@ if __name__ == '__main__':
         im_dir = './output/LIME/*.bmp'
 
     elif ep.MEF:
-        im_dir = './output/LOLv1/*.png'
+        im_dir = './output/MEF/*.png'
 
     elif ep.NPE:
         im_dir = './output/NPE/*.jpg'

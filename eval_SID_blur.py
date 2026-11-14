@@ -4,7 +4,7 @@ from torchvision.transforms import Compose, ToTensor
 from data.data import *
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from net.CIDNet import CIDNet
+from net.DLFENet import DLFENet
 
 cuda = True
 if cuda and not torch.cuda.is_available():
@@ -36,7 +36,7 @@ def eval(model, testing_data_loader, model_path, output_folder):
     
 if __name__ == '__main__':
 
-    net = CIDNet().cuda()
+    net = DLFENet().cuda()
 
     import time
     start_time = time.time()

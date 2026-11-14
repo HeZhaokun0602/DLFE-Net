@@ -6,7 +6,7 @@ from data.data import *
 from torchvision import transforms
 from torch.utils.data import DataLoader
 from loss.losses import *
-from net.CIDNet import CIDNet
+from net.DLFENet import DLFENet
 import os
 from measure import metrics
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    eval_net = CIDNet(sigma=sigma).cuda()
+    eval_net = DLFENet(sigma=sigma).cuda()
     eval(eval_net, eval_data, weight_path, output_folder, norm_size=norm_size, LOL=ep.lol, v2=ep.lol_v2_real, unpaired=ep.unpaired, alpha=alpha, gamma=gamma)
 
     end_time = time.time()
@@ -163,20 +163,25 @@ if __name__ == '__main__':
     if ep.lol:
         im_dir = './output/LOLv1/*.png'
         label_dir = './datasets/LOLv1/eval15/high/'
+        use_GT_mean = True
     if ep.lol_v2_real:
         im_dir = './output/LOLv2_real/*.png'
         label_dir = './datasets/LOLv2/Real_captured/Test/Normal/'
+        use_GT_mean = True
     if ep.lol_v2_syn:
         im_dir = './output/LOLv2_syn/*.png'
         label_dir = './datasets/LOLv2/Synthetic/Test/Normal/'
+        use_GT_mean = True
     if ep.SICE_grad:
         im_dir = './output/SICE_grad/*.png'
         label_dir = './datasets/SICE/SICE_Reshape/'
+        use_GT_mean = False
     if ep.SICE_mix:
         im_dir = './output/SICE_mix/*.png'
         label_dir = './datasets/SICE/SICE_Reshape/'
+        use_GT_mean = False
 
-    avg_psnr, avg_ssim, avg_lpips, avg_arse = metrics(im_dir, label_dir, use_GT_mean=True)
+    avg_psnr, avg_ssim, avg_lpips, avg_arse = metrics(im_dir, label_dir, use_GT_mean=use_GT_mean)
     print("===> Avg.PSNR: {:.4f} dB ".format(avg_psnr))
     print("===> Avg.SSIM: {:.4f} ".format(avg_ssim))
     print("===> Avg.LPIPS: {:.4f} ".format(avg_lpips))

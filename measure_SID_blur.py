@@ -19,7 +19,7 @@ mea = mea_parser.parse_args()
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in [".png", ".jpg", ".bmp", ".JPG", ".jpeg"])
 
-def ssim(prediction, target):
+def cal_ssim(prediction, target):
     C1 = (0.01 * 255)**2
     C2 = (0.03 * 255)**2
     img1 = prediction.astype(np.float64)
@@ -50,15 +50,15 @@ def calculate_ssim(target, ref):
     if not img1.shape == img2.shape:
         raise ValueError('Input images must have the same dimensions.')
     if img1.ndim == 2:
-        return ssim(img1, img2)
+        return cal_ssim(img1, img2)
     elif img1.ndim == 3:
         if img1.shape[2] == 3:
             ssims = []
             for i in range(3):
-                ssims.append(ssim(img1[:, :, i], img2[:, :, i]))
+                ssims.append(cal_ssim(img1[:, :, i], img2[:, :, i]))
             return np.array(ssims).mean()
         elif img1.shape[2] == 1:
-            return ssim(np.squeeze(img1), np.squeeze(img2))
+            return cal_ssim(np.squeeze(img1), np.squeeze(img2))
     else:
         raise ValueError('Wrong input image dimensions.')
 
