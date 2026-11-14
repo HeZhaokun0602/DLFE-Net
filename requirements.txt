@@ -14,5 +14,4 @@ einops==0.6.1
 lpips==0.1.4
 opencv-python
 gradio
-huggingface_hub
 safetensors

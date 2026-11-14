@@ -1,17 +1,13 @@
 from net.HVI_transform import RGB_HVI
 from net.LCA import *
-from huggingface_hub import PyTorchModelHubMixin
-from net.rgb2hsv import rgb_to_hsv_tensor, hsv_to_rgb_tensor
-from net.rgb2yuv import _rgb_to_ycbcr, _ycbcr_to_rgb
-from net.rgb2lab import rgb_to_lab_tensor, lab_to_rgb_tensor
 
-class CIDNet(nn.Module, PyTorchModelHubMixin):
+class DLFENet(nn.Module):
     def __init__(self, 
                  channels=[36, 36, 72, 144],
                  heads=[1, 2, 4, 8],
                  sigma=0.2,
                  norm=False):
-        super(CIDNet, self).__init__()
+        super(DLFENet, self).__init__()
         
         [ch1, ch2, ch3, ch4] = channels
         [head1, head2, head3, head4] = heads
@@ -70,15 +66,6 @@ class CIDNet(nn.Module, PyTorchModelHubMixin):
         hvi = self.trans.HVIT(x)
         i = hvi[:, 2, :, :].unsqueeze(1).to(dtypes)
 
-        #hvi = rgb_to_hsv_tensor(x)
-        #i = hvi[:, 2, :, :].unsqueeze(1).to(dtypes)
-
-        #hvi = _rgb_to_ycbcr(x)
-        #i = hvi[:, 0, :, :].unsqueeze(1).to(dtypes)
-
-        #hvi = rgb_to_lab_tensor(x)
-        #i = hvi[:, 0, :, :].unsqueeze(1).to(dtypes)
-
         i_enc0 = self.IE_block0(i)
         i_enc1 = self.IE_block1(i_enc0)
         hv_0 = self.HVE_block0(hvi)
@@ -124,15 +111,6 @@ class CIDNet(nn.Module, PyTorchModelHubMixin):
         
         output_hvi = torch.cat([hv_0, i_dec0], dim=1) + hvi
         output_rgb = self.trans.PHVIT(output_hvi)
-
-        #output_yuv = torch.cat([i_dec0, hv_0], dim=1) + hvi
-        #output_rgb = _ycbcr_to_rgb(output_yuv)
-
-        #output_hsv = torch.cat([hv_0, i_dec0], dim=1) + hvi
-        #output_rgb = hsv_to_rgb_tensor(output_hsv)
-
-        #output_lab = torch.cat([i_dec0, hv_0], dim=1) + hvi
-        #output_rgb = lab_to_rgb_tensor(output_lab)
 
         return output_rgb
     

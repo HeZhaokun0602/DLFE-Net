@@ -2,7 +2,7 @@ from torchvision import transforms
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from torch.utils.data import DataLoader
-from net.CIDNet import CIDNet
+from net.DLFENet import DLFENet
 from data.options import option
 from measure import metrics
 from eval import eval
@@ -48,7 +48,6 @@ def train(epoch):
         im1 = im1.cuda()
         im2 = im2.cuda()
         
-        # use random gamma function (enhancement curve) to improve generalization
         if opt.gamma:
             gamma = random.randint(opt.start_gamma,opt.end_gamma) / 100.0
             output_rgb = model(im1 ** gamma)  
@@ -152,7 +151,7 @@ def load_datasets():
 
 def build_model():
     print('===> Building model ')
-    model = CIDNet().cuda()
+    model = DLFENet().cuda()
     if opt.start_epoch > 0:
         pth = f"./weights/train/epoch_{opt.start_epoch}.pth"
         model.load_state_dict(torch.load(pth, map_location=lambda storage, loc: storage))
@@ -190,19 +189,12 @@ def init_loss():
 
 
 if __name__ == '__main__':  
-    
-    '''
-    preparision
-    '''
     train_init()
     training_data_loader, testing_data_loader = load_datasets()
     model = build_model()
     optimizer, scheduler = make_scheduler()
     L1_loss, P_loss, E_loss, D_loss = init_loss()
     
-    '''
-    train
-    '''
     psnr = []
     ssim = []
     lpips = []
@@ -214,13 +206,12 @@ if __name__ == '__main__':
 
     import logging
     os.mkdir("./weights/train")
-    # 配置日志记录
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(message)s',
         handlers=[
-            logging.FileHandler('weights/train/training.log'),  # 写入文件
-            logging.StreamHandler()              # 输出到控制台
+            logging.FileHandler('weights/train/training.log'),
+            logging.StreamHandler()
         ]
     )
     logging.info(f"lr: {opt.lr}")
